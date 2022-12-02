@@ -7,8 +7,12 @@ edition = "2021"
 array2d = { git = "https://github.com/klevente/array2d" }
 itertools = "0.10.1"
 phf = { version = "0.11.1", features = ["macros"] }
-sscanf = "0.3.1"
+sscanf = "0.4.0"
 
 [[bin]]
 name = "day1"
 path = "src/day1.rs"
+
+[[bin]]
+name = "day2"
+path = "src/day2.rs"
