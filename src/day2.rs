@@ -66,6 +66,10 @@ impl Outcome {
     }
 }
 
+trait Round {
+    fn calculate_score(&self) -> u32;
+}
+
 #[derive(Debug)]
 struct RoundWithChoices {
     player_choice: Choice,
@@ -82,7 +86,9 @@ impl RoundWithChoices {
             elf_choice,
         }
     }
+}
 
+impl Round for RoundWithChoices {
     fn calculate_score(&self) -> u32 {
         let outcome = match (&self.player_choice, &self.elf_choice) {
             (Choice::Rock, Choice::Scissors)
@@ -103,10 +109,6 @@ impl RoundWithChoices {
     }
 }
 
-fn calculate_total_score_for_rounds_with_choices(rounds: &Vec<RoundWithChoices>) -> u32 {
-    rounds.iter().map(|r| r.calculate_score()).sum()
-}
-
 struct RoundsWithElfChoiceAndOutcome {
     elf_choice: Choice,
     outcome: Outcome,
@@ -122,7 +124,9 @@ impl RoundsWithElfChoiceAndOutcome {
             outcome,
         }
     }
+}
 
+impl Round for RoundsWithElfChoiceAndOutcome {
     fn calculate_score(&self) -> u32 {
         let player_choice = match (&self.outcome, &self.elf_choice) {
             (Outcome::Win, Choice::Rock)
@@ -143,9 +147,7 @@ impl RoundsWithElfChoiceAndOutcome {
     }
 }
 
-fn calculate_total_score_for_rounds_with_choice_and_outcome(
-    rounds: &Vec<RoundsWithElfChoiceAndOutcome>,
-) -> u32 {
+fn calculate_total_score(rounds: &Vec<impl Round>) -> u32 {
     rounds.iter().map(|r| r.calculate_score()).sum()
 }
 
@@ -155,8 +157,7 @@ fn main() {
         .iter()
         .map(|(a, b)| RoundWithChoices::new(*a, *b))
         .collect::<Vec<_>>();
-    let total_score_rounds_with_choices =
-        calculate_total_score_for_rounds_with_choices(&rounds_with_choices);
+    let total_score_rounds_with_choices = calculate_total_score(&rounds_with_choices);
     println!("The total score for rounds with choices if everything goes exactly according to the strategy guide is {total_score_rounds_with_choices}");
 
     let rounds_with_choice_and_outcome = lines_parsed
@@ -164,6 +165,6 @@ fn main() {
         .map(|(a, b)| RoundsWithElfChoiceAndOutcome::new(*a, *b))
         .collect::<Vec<_>>();
     let total_score_rounds_with_choice_and_outcome =
-        calculate_total_score_for_rounds_with_choice_and_outcome(&rounds_with_choice_and_outcome);
+        calculate_total_score(&rounds_with_choice_and_outcome);
     println!("The total score for rounds with choice and outcome if everything goes exactly according to the strategy guide is {total_score_rounds_with_choice_and_outcome}");
 }
