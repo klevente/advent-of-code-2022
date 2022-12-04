@@ -15,9 +15,11 @@ fn calculate_item_priority(c: char) -> u32 {
     if c.is_ascii_lowercase() {
         let difference = c as u8 - 'a' as u8;
         (1 + difference) as u32
-    } else {
+    } else if c.is_ascii_uppercase() {
         let difference = c as u8 - 'A' as u8;
         (27 + difference) as u32
+    } else {
+        0u32
     }
 }
 
