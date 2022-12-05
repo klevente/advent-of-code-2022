@@ -1,6 +1,16 @@
 use array2d::Array2D;
 use std::{convert::TryInto, fmt::Display, fs::read_to_string, path::Path};
 
+#[cfg(windows)]
+pub const LINE_SEPARATOR: &'static str = "\r\n";
+#[cfg(not(windows))]
+pub const LINE_SEPARATOR: &'static str = "\n";
+
+#[cfg(windows)]
+pub const EMPTY_LINE_PATTERN: &'static str = "\r\n\r\n";
+#[cfg(not(windows))]
+pub const EMPTY_LINE_PATTERN: &'static str = "\n\n";
+
 pub fn read_file_to_string(path: impl AsRef<Path>) -> String {
     read_to_string(path).unwrap()
 }
