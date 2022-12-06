@@ -1,12 +1,11 @@
 use advent_of_code_2022::read_file_to_string;
 use itertools::Itertools;
-use std::collections::HashSet;
 
 fn find_position_of_first_n_unique_chars(n: usize, s: &str) -> Option<usize> {
     let v = s.chars().collect::<Vec<_>>();
     let result = v
         .windows(n)
-        .find_position(|&x| x.iter().unique().count() == n);
+        .find_position(|x| x.iter().unique().count() == n);
     result.map(|(idx, _)| idx + n)
 }
 
