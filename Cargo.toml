@@ -8,6 +8,7 @@ array2d = { git = "https://github.com/klevente/array2d" }
 itertools = "0.10.1"
 phf = { version = "0.11.1", features = ["macros"] }
 sscanf = "0.4.0"
+take-until = "0.1.0"
 
 [[bin]]
 name = "day1"
@@ -36,4 +37,9 @@ path = "src/day6.rs"
 [[bin]]
 name = "day7"
 path = "src/day7.rs"
+
+[[bin]]
+name = "day8"
+path = "src/day8.rs"
+
 
