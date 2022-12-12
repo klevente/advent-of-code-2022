@@ -1,5 +1,10 @@
 use array2d::Array2D;
-use std::{convert::TryInto, fmt::Display, fs::read_to_string, path::Path};
+use std::{
+    convert::{identity, TryInto},
+    fmt::Display,
+    fs::read_to_string,
+    path::Path,
+};
 
 #[cfg(windows)]
 pub const LINE_SEPARATOR: &'static str = "\r\n";
@@ -73,21 +78,29 @@ pub fn print_usize_2d_array_with_delim(array: &Array2D<usize>) {
     for row in array.rows_iter() {
         print!("|");
         for column in row.into_iter() {
-            print!("{:5}|", column);
+            if column == &usize::MAX {
+                print!("{:5}|", "  MAX");
+            } else {
+                print!("{:5}|", column);
+            }
         }
         println!();
     }
 }
 
-pub fn parse_2d_number_grid(s: &str) -> Array2D<u8> {
+pub fn parse_2d_grid_as<T: Clone>(s: &str, f: fn(char) -> T) -> Array2D<T> {
     let elements = &*s
         .lines()
-        .map(|l| {
-            l.chars()
-                .map(|d| d.to_digit(10).unwrap() as u8)
-                .collect::<Vec<_>>()
-        })
+        .map(|l| l.chars().map(f).collect::<Vec<_>>())
         .collect::<Vec<_>>();
 
     Array2D::from_rows(elements).unwrap()
+}
+
+pub fn parse_2d_char_grid(s: &str) -> Array2D<char> {
+    parse_2d_grid_as(s, identity)
+}
+
+pub fn parse_2d_number_grid(s: &str) -> Array2D<u8> {
+    parse_2d_grid_as(s, |d| d.to_digit(10).unwrap() as u8)
 }
