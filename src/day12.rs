@@ -4,6 +4,11 @@ use std::{collections::HashSet, str::FromStr};
 
 type Coords = (usize, usize);
 
+enum Direction {
+    Forwards,
+    Backwards,
+}
+
 struct Valley {
     height_map: Array2D<u8>,
     start: Coords,
@@ -56,27 +61,30 @@ impl FromStr for Valley {
 
 impl Valley {
     fn find_length_of_shortest_path_from_start_to_finish(&self) -> usize {
-        let shortest_paths = self.find_shortest_paths_from(&self.start);
+        let shortest_paths = self.find_shortest_paths_from(&self.start, &Direction::Forwards);
         *shortest_paths.get(self.finish.0, self.finish.1).unwrap()
     }
 
     fn find_length_of_shortest_path_from_lowest_points_to_finish(&self) -> usize {
+        let shortest_paths_from_finish =
+            self.find_shortest_paths_from(&self.finish, &Direction::Backwards);
         self.height_map
             .indices_row_major()
             .filter_map(|(r, c)| {
-                self.height_map
-                    .get(r, c)
-                    .filter(|&h| h == &0u8)
-                    .and_then(|_| {
-                        let shortest_paths = self.find_shortest_paths_from(&(r, c));
-                        shortest_paths.get(self.finish.0, self.finish.1).copied()
-                    })
+                let height = *self.height_map.get(r, c).unwrap();
+
+                if height == 0 {
+                    let path = *shortest_paths_from_finish.get(r, c).unwrap();
+                    Some(path)
+                } else {
+                    None
+                }
             })
             .min()
             .unwrap()
     }
 
-    fn find_shortest_paths_from(&self, start: &Coords) -> Array2D<usize> {
+    fn find_shortest_paths_from(&self, start: &Coords, dir: &Direction) -> Array2D<usize> {
         let mut shortest_path_until = Array2D::filled_with(
             usize::MAX,
             self.height_map.num_rows(),
@@ -89,7 +97,7 @@ impl Valley {
 
         while !coords_under_improvement.is_empty() {
             coords_under_improvement =
-                self.try_improve_paths(&mut shortest_path_until, coords_under_improvement);
+                self.try_improve_paths(&mut shortest_path_until, coords_under_improvement, dir);
         }
 
         shortest_path_until
@@ -99,11 +107,12 @@ impl Valley {
         &self,
         shortest_path_until: &mut Array2D<usize>,
         coords_under_improvement: HashSet<Coords>,
+        dir: &Direction,
     ) -> HashSet<Coords> {
         let mut changed = HashSet::new();
         for (row, column) in coords_under_improvement {
             let shortest_path_len = *shortest_path_until.get(row, column).unwrap();
-            let neighbours = self.get_neighbours(&(row, column));
+            let neighbours = self.get_neighbours(&(row, column), dir);
             for n in &neighbours {
                 let neighbour_shortest_len = *shortest_path_until.get(n.0, n.1).unwrap();
 
@@ -118,7 +127,16 @@ impl Valley {
         changed
     }
 
-    fn get_neighbours(&self, pos: &Coords) -> Vec<Coords> {
+    /*
+     * checks whether a tile is reachable from another tile according to the rule:
+     * a tile is reachable from the current if it's at most 1 higher
+     * e.g. if `current = 5`, then neighbour can be `0..=6`
+     */
+    fn can_reach(current_height: u8, neighbour_height: u8) -> bool {
+        current_height + 1 >= neighbour_height
+    }
+
+    fn get_neighbours(&self, pos: &Coords, dir: &Direction) -> Vec<Coords> {
         let row = pos.0 as isize;
         let column = pos.1 as isize;
         let neighbour_positions = [
@@ -128,7 +146,7 @@ impl Valley {
             (row + 1, column),
         ];
 
-        let height = self.get_height_at(pos.0, pos.1);
+        let height = self.get_height_at(pos.0, pos.1).unwrap();
 
         neighbour_positions
             .iter()
@@ -136,12 +154,14 @@ impl Valley {
                 if *r >= 0 && *c >= 0 {
                     let r = *r as usize;
                     let c = *c as usize;
-                    let neighbour_height = self.get_height_at(r, c);
-                    if height + 1 >= neighbour_height {
-                        Some((r, c))
-                    } else {
-                        None
-                    }
+                    self.get_height_at(r, c)
+                        .filter(|&neighbour_height| match dir {
+                            // when going forwards check what neighbouring tiles can the current tile reach
+                            Direction::Forwards => Self::can_reach(height, neighbour_height),
+                            // when going backwards, check the opposite: what neighbouring tiles can reach the current tile
+                            Direction::Backwards => Self::can_reach(neighbour_height, height),
+                        })
+                        .and(Some((r, c)))
                 } else {
                     None
                 }
@@ -149,8 +169,8 @@ impl Valley {
             .collect()
     }
 
-    fn get_height_at(&self, row: usize, column: usize) -> u8 {
-        self.height_map.get(row, column).copied().unwrap_or(u8::MAX)
+    fn get_height_at(&self, row: usize, column: usize) -> Option<u8> {
+        self.height_map.get(row, column).copied()
     }
 }
 
