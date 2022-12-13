@@ -104,3 +104,17 @@ pub fn parse_2d_char_grid(s: &str) -> Array2D<char> {
 pub fn parse_2d_number_grid(s: &str) -> Array2D<u8> {
     parse_2d_grid_as(s, |d| d.to_digit(10).unwrap() as u8)
 }
+
+#[macro_export]
+macro_rules! unwrap_enum_variant_inner {
+    ($target: expr, $pat: path) => {{
+        if let $pat(a) = $target {
+            a
+        } else {
+            panic!(
+                "found mismatched variant when casting to {}",
+                stringify!($pat)
+            );
+        }
+    }};
+}
