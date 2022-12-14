@@ -154,7 +154,7 @@ impl Cave {
         layout
     }
 
-    fn drop_sand(&mut self) -> bool {
+    fn drop_sand_into_abyss(&mut self) -> bool {
         let mut sand_position = SAND_STARTING_POSITION;
         loop {
             if self.is_at_bottom(sand_position) {
@@ -176,7 +176,7 @@ impl Cave {
         }
     }
 
-    fn drop_sand_2(&mut self) -> bool {
+    fn drop_sand_into_floor(&mut self) -> bool {
         let mut sand_position = SAND_STARTING_POSITION;
         loop {
             if self.is_air_at(sand_position.0, sand_position.1 + 1) {
@@ -225,7 +225,7 @@ impl Cave {
 fn count_number_of_sand_until_it_starts_falling_into_abyss(input: &str) -> u32 {
     let mut cave = Cave::from_str_with_abyss(input);
     let mut cnt = 0;
-    while !cave.drop_sand() {
+    while !cave.drop_sand_into_abyss() {
         cnt += 1;
     }
 
@@ -235,7 +235,7 @@ fn count_number_of_sand_until_it_starts_falling_into_abyss(input: &str) -> u32 {
 fn count_number_of_sand_until_it_stops_falling(input: &str) -> u32 {
     let mut cave = Cave::from_str_with_floor(input);
     let mut cnt = 1;
-    while !cave.drop_sand_2() {
+    while !cave.drop_sand_into_floor() {
         cnt += 1;
     }
 
