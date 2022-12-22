@@ -64,6 +64,15 @@ pub fn print_2d_array<T: Clone + Display>(array: &Array2D<T>) {
     }
 }
 
+pub fn print_2d_array_flipped_vertically<T: Clone + Display>(array: &Array2D<T>) {
+    for row in array.rows_iter().rev() {
+        for column in row.into_iter() {
+            print!("{}", column);
+        }
+        println!();
+    }
+}
+
 pub fn print_u8_2d_array_with_delim(array: &Array2D<u8>) {
     for row in array.rows_iter() {
         print!("|");
