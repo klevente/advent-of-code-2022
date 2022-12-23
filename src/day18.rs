@@ -82,21 +82,21 @@ impl Pond {
         let mut visited_cubes = HashSet::new();
         let mut area = 0;
         // walk through the wireframe of the bounding cube and start flood filling
-        for x in -1..=22 {
+        for x in self.min..=self.max {
             area += self.flood_fill_from((x, self.min, self.min), &mut visited_cubes);
             area += self.flood_fill_from((x, self.max, self.min), &mut visited_cubes);
             area += self.flood_fill_from((x, self.min, self.max), &mut visited_cubes);
             area += self.flood_fill_from((x, self.max, self.max), &mut visited_cubes);
         }
 
-        for y in -1..=22 {
+        for y in self.min..=self.max {
             area += self.flood_fill_from((self.min, y, self.min), &mut visited_cubes);
             area += self.flood_fill_from((self.max, y, self.min), &mut visited_cubes);
             area += self.flood_fill_from((self.min, y, self.max), &mut visited_cubes);
             area += self.flood_fill_from((self.max, y, self.max), &mut visited_cubes);
         }
 
-        for z in -1..=22 {
+        for z in self.min..=self.max {
             area += self.flood_fill_from((self.min, self.min, z), &mut visited_cubes);
             area += self.flood_fill_from((self.max, self.min, z), &mut visited_cubes);
             area += self.flood_fill_from((self.min, self.max, z), &mut visited_cubes);
