@@ -18,7 +18,7 @@ enum Monkey {
         rhs: String,
     },
     Const(i64),
-    Human,
+    Variable,
 }
 
 impl Monkey {
@@ -77,7 +77,7 @@ impl Monkey {
     fn parse_for_second_part(s: &str) -> (String, Self) {
         let (name, expression) = s.split_once(": ").unwrap();
         if name == "humn" {
-            return (name.to_string(), Monkey::Human);
+            return (name.to_string(), Monkey::Variable);
         }
         let (operation, lhs, rhs) = if let Some((lhs, rhs)) = expression.split_once(" + ") {
             if name == "root" {
@@ -132,7 +132,7 @@ impl Monkey {
                 }
             }
             Monkey::Const(n) => Some(*n),
-            Monkey::Human => None,
+            Monkey::Variable => None,
         }
     }
 
@@ -196,7 +196,7 @@ impl Monkey {
                 }
             }
             Monkey::Const(_) => None,
-            Monkey::Human => Some(n),
+            Monkey::Variable => Some(n),
         }
     }
 }
