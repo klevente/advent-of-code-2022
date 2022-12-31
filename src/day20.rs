@@ -16,15 +16,7 @@ fn check_indices_unique_and_in_bounds(indices: &[(i64, usize)]) {
     let unique = iter.clone().all_unique();
 
     if !unique {
-        let freq = indices
-            .iter()
-            .fold(HashMap::new(), |mut acc, (_, i)| {
-                *acc.entry(*i).or_insert(0) += 1;
-                acc
-            })
-            .into_iter()
-            .filter(|(_, f)| f > &1)
-            .collect::<HashMap<_, _>>();
+        let freq = indices.iter().counts();
         dbg!(freq);
         panic!("The indices were not unique");
     }
