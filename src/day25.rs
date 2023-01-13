@@ -23,11 +23,11 @@ fn snafu_to_decimal(n: &str) -> i64 {
 
 fn decimal_digit_to_snafu(d: i64) -> char {
     match d {
-        -2 => '=',
-        -1 => '-',
         0 => '0',
         1 => '1',
         2 => '2',
+        3 => '=',
+        4 => '-',
         _ => unreachable!(),
     }
 }
@@ -38,15 +38,7 @@ fn decimal_to_snafu(n: i64) -> String {
     let mut carry = 0;
     while n != 0 {
         let mut digit = (n + carry) % 5;
-        if digit == 4 {
-            digit = -1;
-            carry = 1
-        } else if digit == 3 {
-            digit = -2;
-            carry = 1;
-        } else {
-            carry = 0;
-        }
+        carry = if digit == 3 || digit == 4 { 1 } else { 0 };
         let digit = decimal_digit_to_snafu(digit);
         result.push_front(digit);
 
